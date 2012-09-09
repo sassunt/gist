@@ -4,6 +4,7 @@ import xsbti.{ AppMain, AppConfiguration }
 import java.io.{ InputStream, OutputStream }
 import dispatch.Http
 import java.util.Scanner
+import Color._
 
 object Script {
   case class Options(name: Option[String] = None,
@@ -135,13 +136,15 @@ object Script {
   private def showOneline(ref: GistRef) =
     ref.htmlUrl
 
-  private def show(ref: GistRef) =
-    "%s %s %s <%s> %s %s" format(if (ref.public) "+" else "-",
-                         bold(ref.id),
+  private def show(ref: GistRef) = {
+    val color = if (ref.public) "CYAN" else "MAGENTA"
+    "%s %s %s <%s> %s %s" format((if (ref.public) "+" else "-") :# color,
+                         bold(ref.id  :# color),
                          ref.htmlUrl,
-                         ref.author,
-                         ref.desc,
+                         ref.author   :# "YELLOW",
+                         ref.desc     :# "BLUE",
                          ref.files.map(f => "\n * %s (%s)" format(f.name, f.size)).mkString("\n"))
+  }
 
   private def cat(ref: GistRef) =
     if (ref.files.isEmpty) "gist %s contained no files" format ref.id
@@ -151,12 +154,12 @@ object Script {
     err(msg.getMessage())
 
   private def err(msg: String): Int = {
-    System.err.println("error: %s" format msg)
+    System.err.println(("error: %s" format msg) :# "RED")
     1
   }
 
-  private def ok(msg: String) = {
-    println(msg)
+  private def ok(msg: String, color: String = "GREEN") = {
+    println(msg :# color)
     0
   }
 
